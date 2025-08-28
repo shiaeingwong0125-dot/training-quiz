@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Learning Partner Assessment Quiz</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(180deg); }
+        }
+        
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .quiz-content {
+            padding: 40px;
+        }
+        
+        .question {
+            margin-bottom: 40px;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeInUp 0.6s ease forwards;
+        }
+        
+        .question:nth-child(2) { animation-delay: 0.1s; }
+        .question:nth-child(3) { animation-delay: 0.2s; }
+        .question:nth-child(4) { animation-delay: 0.3s; }
+        .question:nth-child(5) { animation-delay: 0.4s; }
+        
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .question h3 {
+            font-size: 1.4rem;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #3498db;
+            display: inline-block;
+        }
+        
+        .options {
+            display: grid;
+            gap: 12px;
+        }
+        
+        .option {
+            display: flex;
+            align-items: center;
+            padding: 15px 20px;
+            background: #f8f9fa;
+            border: 2px solid transparent;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .option::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(52, 152, 219, 0.1), transparent);
+            transition: left 0.5s;
+        }
+        
+        .option:hover::before {
+            left: 100%;
+        }
+        
+        .option:hover {
+            border-color: #3498db;
+            background: #e8f4f8;
+            transform: translateX(5px);
+        }
+        
+        .option.selected {
+            border-color: #27ae60;
+            background: #d5f4e6;
+            transform: translateX(5px);
+        }
+        
+        .option input[type="radio"] {
+            width: 20px;
+            height: 20px;
+            margin-right: 15px;
+            cursor: pointer;
+            accent-color: #3498db;
+        }
+        
+        .option label {
+            cursor: pointer;
+            font-weight: 500;
+            color: #34495e;
+            position: relative;
+            z-index: 1;
+            line-height: 1.4;
+        }
+        
+        .calculate-btn {
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+            color: white;
+            border: none;
+            padding: 20px 40px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: block;
+            margin: 40px auto 20px;
+            box-shadow: 0 10px 20px rgba(52, 152, 219, 0.3);
+        }
+        
+        .calculate-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px rgba(52, 152, 219, 0.4);
+        }
+        
+        .calculate-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .results {
+            margin-top: 40px;
+            padding: 30px;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 15px;
+            border: 2px solid #3498db;
+            display: none;
+            animation: slideIn 0.5s ease;
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .result-header {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+            color: #2c3e50;
+        }
+        
+        .result-description {
+            font-size: 1.1rem;
+            line-height: 1.6;
+            color: #34495e;
+            margin-bottom: 20px;
+        }
+        
+        .score-breakdown {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+            border-left: 4px solid #3498db;
+        }
+        
+        .score-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid #ecf0f1;
+        }
+        
+        .score-item:last-child {
+            border-bottom: none;
+        }
+        
+        .score-label {
+            font-weight: 500;
+            color: #34495e;
+        }
+        
+        .score-value {
+            font-weight: 700;
+            color: #3498db;
+            font-size: 1.1rem;
+        }
+        
+        .cta-section {
+            text-align: center;
+            margin-top: 30px;
+            padding: 25px;
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+            color: white;
+            border-radius: 12px;
+        }
+        
+        .cta-section h4 {
+            font-size: 1.3rem;
+            margin-bottom: 15px;
+        }
+        
+        .cta-button {
+            display: inline-block;
+            background: white;
+            color: #3498db;
+            padding: 12px 30px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: #ecf0f1;
+            border-radius: 3px;
+            margin-bottom: 30px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #3498db, #2980b9);
+            width: 0;
+            transition: width 0.3s ease;
+            border-radius: 3px;
+        }
+        
+        @media (max-width: 600px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .header p {
+                font-size: 1rem;
+            }
+            
+            .quiz-content {
+                padding: 20px;
+            }
+            
+            .question h3 {
+                font-size: 1.2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎯 Are You Getting Real Training ROI?</h1>
+            <p>Find out if your current approach delivers actual performance improvement — or just checkboxes</p>
+        </div>
+        
+        <div class="quiz-content">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            
+            <form id="quizForm">
+                <div class="question">
+                    <h3>Q1. What best describes your current situation?</h3>
+                    <div class="options">
+                        <div class="option">
+                            <input type="radio" id="q1a" name="q1" value="C">
+                            <label for="q1a">We have content that needs to be converted into training modules</label>
+                        </div>
+                        <div class="option">
+                            <input type="radio" id="q1b" name="q1" value="P">
+                            <label for="q1b">We've chosen our platform and need to populate it with content</label>
+                        </div>
+                        <div class="option">
+                            <input type="radio" id="q1c" name="q1" value="S">
+                            <label for="q1c">We've identified performance gaps that need to be addressed</label>
+                        </div>
+                        <div class="option">
+                            <input type="radio" id="q1d" name="q1" value="S">
+                            <label for="q1d">We're starting a new initiative and exploring the best approach</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="question">
+                    <h3>Q2. What does success look like for this project?</h3>
+                    <div class="options">
+                        <div class="option">
+                            <input type="radio" id="q2a" name="q2" value="C">
+                            <label for="q2a">High completion rates and positive learner feedback</label>
+                        </div>
+                        <div class="option">
+                            <input type="radio" id="q2b" name="q2" value="P">
+                            <label for="q2b">A deployed solution that stakeholders can see and access</label>
+                        </div>
+                        <div class="option">
+                            <input type="radio" id="q2c" name="q2" value="S">
+                            <label for="q2c">Measurable improvement in how people perform their jobs</label>
+                        </div>
+                        <div class="option">
+                            <input type="radio" id="q2d" name="q2" value="S">
+                            <label for="q2d">Changes in business metrics or organizational capabilities</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="question">
+                    <h3>Q3. How well-defined is the solution approach?</h3>
+                    <div class="options">
+                        <div class="option">
+                            <input type="radio" id="q3a" name="q3" value="C">
+                            <label for="q3a">Very clear — we know exactly what needs to be built</label>
+                        </div>
+                        <div class="option">
+                            <input type="radio" id="q3b" name="q3" value="P">
+                            <label for="q3b">Mostly defined — we're working within platform capabilities</label>
+                        </div>
+                        <div class="option">
+                            <input type="radio" id="q3c" name="q3" value="S">
+                            <label for="q3c">Still evolving — we're learning as we go</label>
+                        </div>
+                        <div class="option">
+                            <input type="radio" id="q3d" name="q3" value="S">
+                            <label for="q3d">Complex situation — multiple factors need to be considered</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="question">
+                    <h3>Q4. What's driving this training initiative?</h3>
+                    <div class="options">
+                        <div class="option">
+                            <input type="radio" id="q4a" name="q4" value="C">
+                            <label for="q4a">We have content/materials that need to be made accessible</label>
+                        </div>
+                        <div class="option">
+                            <input type="radio" id="q4b" name="q4" value="P">
+                            <label for="q4b">Compliance requirements or administrative needs</label>
+                        </div>
+                        <div class="option">
+                            <input type="radio" id="q4c" name="q4" value="S">
+                            <label for="q4c">Performance problems that impact business results</label>
+                        </div>
+                        <div class="option">
+                            <input type="radio" id="q4d" name="q4" value="S">
+                            <label for="q4d">Strategic goals that require new capabilities</label>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="button" class="calculate-btn" onclick="calculateResults()" id="calculateBtn">
+                    🎯 Get My Assessment
+                </button>
+            </form>
+
+            <div id="results" class="results">
+                <div id="resultContent"></div>
+                
+                <div class="score-breakdown">
+                    <h4 style="margin-bottom: 15px; color: #2c3e50;">Your Response Summary:</h4>
+                    <div class="score-item">
+                        <span class="score-label">📋 Content Focus</span>
+                        <span class="score-value" id="scoreC">0</span>
+                    </div>
+                    <div class="score-item">
+                        <span class="score-label">🚀 Rollout Focus</span>
+                        <span class="score-value" id="scoreP">0</span>
+                    </div>
+                    <div class="score-item">
+                        <span class="score-label">🎯 Performance Focus</span>
+                        <span class="score-value" id="scoreS">0</span>
+                    </div>
+                </div>
+
+                <div class="cta-section">
+                    <h4>Want to ensure your training investment delivers real ROI?</h4>
+                    <p style="margin-bottom: 15px;">Let's have a 20-minute conversation about your specific situation and explore whether The Growth Perspective's strategic approach is the right fit.</p>
+                    <a href="mailto:pooja.j@thegrowthperspective.com?subject=Training%20ROI%20Strategy%20Call%20-%20Quiz%20Assessment&body=Hi%20Pooja,%0A%0AI%20just%20completed%20your%20training%20assessment%20quiz%20and%20would%20like%20to%20schedule%20a%20strategy%20call%20to%20discuss%20my%20specific%20situation.%0A%0ABest%20regards" class="cta-button">Book a Strategy Call</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Update selected option styles
+        function updateSelectedStyles() {
+            document.querySelectorAll('.option').forEach(option => {
+                const input = option.querySelector('input');
+                if (input && input.checked) {
+                    option.classList.add('selected');
+                } else {
+                    option.classList.remove('selected');
+                }
+            });
+        }
+
+        // Update progress bar
+        function updateProgress() {
+            const answeredQuestions = document.querySelectorAll('input[type="radio"]:checked').length;
+            const progress = (answeredQuestions / 4) * 100;
+            document.getElementById('progressFill').style.width = progress + '%';
+            
+            // Enable button if all questions answered
+            document.getElementById('calculateBtn').disabled = answeredQuestions < 4;
+        }
+
+        // Add event listeners to all radio buttons
+        document.querySelectorAll('input[type="radio"]').forEach(radio => {
+            radio.addEventListener('change', function() {
+                updateProgress();
+                updateSelectedStyles();
+            });
+        });
+
+        function calculateResults() {
+            const form = document.getElementById('quizForm');
+            const formData = new FormData(form);
+            
+            let scores = {C: 0, P: 0, S: 0};
+            
+            // Count scores (1 point per question)
+            for (let i = 1; i <= 4; i++) {
+                const answer = formData.get(`q${i}`);
+                if (answer) {
+                    scores[answer]++;
+                }
+            }
+            
+            // Update score display
+            document.getElementById('scoreC').textContent = scores.C;
+            document.getElementById('scoreP').textContent = scores.P;
+            document.getElementById('scoreS').textContent = scores.S;
+            
+            // Determine result (highest score wins)
+            let primaryResult = '';
+            if (scores.S > scores.C && scores.S > scores.P) {
+                primaryResult = 'S';
+            } else if (scores.C > scores.S && scores.C > scores.P) {
+                primaryResult = 'C';
+            } else if (scores.P > scores.S && scores.P > scores.C) {
+                primaryResult = 'P';
+            } else {
+                // Handle ties - prioritize S, then C, then P
+                if (scores.S >= scores.C && scores.S >= scores.P) {
+                    primaryResult = 'S';
+                } else if (scores.C >= scores.P) {
+                    primaryResult = 'C';
+                } else {
+                    primaryResult = 'P';
+                }
+            }
+            
+            let resultHTML = '';
+            
+            if (primaryResult === 'C') {
+                resultHTML = `
+                    <div class="result-header">🔄 Your Training Needs Assessment</div>
+                    <div class="result-description">
+                        <strong>You seem to have clear requirements and need efficient execution.</strong> Most eLearning vendors can take your existing content and package it into training modules quickly and cost-effectively.
+                        <br><br>
+                        <strong style="color: #e74c3c;">⚠️ Just be aware: content ≠ change.</strong>
+                        <br><br>
+                        If you need performance improvement — not just training completion — content conversion alone rarely delivers that. Even the best-designed modules don't guarantee people will change how they work.
+                        <br><br>
+                        <em>Consider this:</em> Will completing these modules actually solve the business problem that triggered this training request? If the answer isn't clearly "yes," you might need a more strategic approach.
+                    </div>
+                `;
+            } else if (primaryResult === 'P') {
+                resultHTML = `
+                    <div class="result-header">🏗️ Your Training Needs Assessment</div>
+                    <div class="result-description">
+                        <strong>You appear focused on deployment and user adoption.</strong> Platform vendors excel at getting solutions live quickly and ensuring good engagement metrics.
+                        <br><br>
+                        <strong style="color: #e74c3c;">⚠️ Just remember: engagement ≠ performance improvement.</strong>
+                        <br><br>
+                        Platforms optimise for completion rates and user satisfaction, but if your success depends on people actually changing their behaviour at work, a platform-first approach may not address the root causes of performance gaps. Additionally, platform vendors do not conduct a needs analysis for you. Sure some of their features would be useful to you. But, <em>ask yourself:</em> Does your chosen platform strategy tackle the specific barriers preventing good performance in your organisation? Are you training people simply because the platform makes it easy to deploy? Does the platform have the capability to embed performance improvement into the core culture of your company?
+                    </div>
+                `;
+            } else {
+                resultHTML = `
+                    <div class="result-header">🎯 Your Training Needs Assessment</div>
+                    <div class="result-description">
+                        <strong>You're clearly focused on measurable business impact.</strong> You recognise that effective training must address the real barriers to good performance, not just deliver content.
+                        <br><br>
+                        <strong style="color: #27ae60;">✅ This is exactly where The Growth Perspective excels.</strong>
+                        <br><br>
+                        We start by diagnosing why current performance isn't meeting expectations — whether it's knowledge, skills, motivation, or systems issues. Then we design solutions that directly connect to your business outcomes and build organisational capability that scales beyond single projects.
+                        <br><br>
+                        <em>The result:</em> You measure behaviour change and business impact, not just completion rates.
+                    </div>
+                `;
+            }
+            
+            document.getElementById('resultContent').innerHTML = resultHTML;
+            document.getElementById('results').style.display = 'block';
+            document.getElementById('results').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Initialize
+        updateProgress();
+        updateSelectedStyles();
+    </script>
+</body>
+</html>
